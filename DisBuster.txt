@@ -1,0 +1,10 @@
+Link tải về: https://sourceforge.net/projects/dirbuster/
+
+1. Tải về và chạy file .exe
+2. Mở thư mục "des/DisBuster" và chạy file "DisBuster.jar
+3. Cách dùng:
+    - Target URL: trang URL mục tiêu 
+    - Number of Threads tùy chỉnh (nên khoảng loanh quanh 100 hoặc chọn  "Go faster")
+    - File with list ...: chọn file Wordlist.txt, lúc tải DisBuster sẽ tải kèm 9 Wordlist nằm trong mục  "des/DisBuster"
+    - Tắt tùy chọn "Be  Recursive" và "Brute Force Files" để chạy nhanh hơn 
+    - Ấn start

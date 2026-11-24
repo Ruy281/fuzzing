@@ -1,0 +1,3 @@
+http://php.testinvicti.com/hello.php?name=test
+http://php.testinvicti.com/auth/login.php
+http://php.testinvicti.com/comment.php
