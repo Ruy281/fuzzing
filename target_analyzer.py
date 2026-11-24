@@ -32,12 +32,16 @@ class TargetAnalyzer:
         parsed = urlparse(url)
         if parsed.query:
             params.extend(parse_qs(parsed.query, keep_blank_values=True).keys())
+            # keep blan values de giu ca nhung tham so khong co gia tri, vi no van la 1 tham so hop le tren URL
         if "?" in parsed.fragment:
             frag_query = parsed.fragment.split("?", 1)[1]
             params.extend(parse_qs(frag_query, keep_blank_values=True).keys())
         return list(dict.fromkeys(params))
+        #tham so co the ko nam o phan query cua Url ma co the nam o fragment, vi vay can phai kiem tra ca 2 phan. 
+        #Ngoai ra, su dung dict.fromkeys de loai bo cac tham so trung lap
 
     @staticmethod
+    #Muc dich de co the xac dinh vi tri cua form qua id, name hoac index cua form trong trang html
     def _build_selector(tag, fallback_index: int = 0) -> str:
         """Tạo CSS selector ngắn gọn để định danh phần tử."""
         tag_id = tag.get("id")
@@ -47,7 +51,8 @@ class TargetAnalyzer:
         if tag_name:
             return f'{tag.name}[name="{tag_name}"]'
         return f"{tag.name}[index={fallback_index}]"
-
+    
+    #Thuat toan chinh
     async def analyze_page(self, page: Page, url: str) -> List[Target]:
         """Lấy HTML đã render từ page và trả về danh sách đối tượng Target."""
         targets: List[Target] = []
@@ -67,17 +72,17 @@ class TargetAnalyzer:
         soup = BeautifulSoup(html, "html.parser")
 
         # 2. Target loại 'form' (mỗi thẻ <form> là 1 Target)
-        forms = soup.find_all("form")
+        forms = soup.find_all("form") #loc tat ca cac form trong trang html
         for idx, form in enumerate(forms):
-            form_selector = self._build_selector(form, idx)
+            form_selector = self._build_selector(form, idx) #xac dinh kieu form
             inputs_info = []
-            for inp in form.find_all(["input", "textarea", "select"]):
+            for inp in form.find_all(["input", "textarea", "select"]): #thu thap cac truong cua form
                 inputs_info.append({
                     "name": inp.get("name") or inp.get("id") or "",
                     "type": (inp.get("type") or inp.name).lower()
                 })
 
-            targets.append(
+            targets.append( #tao ra target
                 Target(
                     url=url,
                     label="form",
@@ -90,6 +95,7 @@ class TargetAnalyzer:
                 )
             )
 
+        #3. Target loại 'file_upload' 
             # Kiểm tra nếu form có enctype multipart nhưng chưa có thẻ input[type=file]
             file_inputs_in_form = form.find_all("input", {"type": lambda t: t and t.lower() == "file"})
             enctype = (form.get("enctype") or "").lower()
@@ -106,7 +112,7 @@ class TargetAnalyzer:
                     )
                 )
 
-        # 3. Target loại 'file_upload' (mỗi <input type="file"> là 1 Target)
+        # Target loại 'file_upload' (mỗi <input type="file"> là 1 Target)
         file_inputs = soup.find_all("input", {"type": lambda t: t and t.lower() == "file"})
         for idx, f_inp in enumerate(file_inputs):
             parent_form = f_inp.find_parent("form")
